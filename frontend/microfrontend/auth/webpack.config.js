@@ -1,20 +1,22 @@
 const { ModuleFederationPlugin } = require('@module-federation/enhanced');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
 const deps = require("./package.json").dependencies;
 
 module.exports = {
   entry: './src/index',
   output: {
-    publicPath: 'auto',
-    clean: true,
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
   },
 
   devServer: {
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
     },
+    allowedHosts: "all",
     port: 3001,
+    open: true,
     historyApiFallback: true,
   },
 
@@ -25,11 +27,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.m?js/,
-        type: "javascript/auto",
-        resolve: {
-          fullySpecified: false,
-        },
+        test: '/\.html/',
+        use: ['html-loader']
       },
       {
         test: /\.(jpg|png|gif|jpeg|ico)$/,
@@ -70,11 +69,20 @@ module.exports = {
           singleton: true,
           requiredVersion: deps['react-dom'],
         },
+        'react-router-dom': {
+            singleton: true,
+            requiredVersion: deps['react-router-dom'],
+        },
+
         '@material-ui/core': {
           singleton: true,
           requiredVersion: deps['@material-ui/core'],
         }
       }
     }),
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, 'public', 'index.html'),
+      filename: './index.html',
+    })
   ],
 };

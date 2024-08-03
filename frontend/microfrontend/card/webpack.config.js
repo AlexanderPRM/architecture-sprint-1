@@ -1,7 +1,7 @@
 const { ModuleFederationPlugin } = require('@module-federation/enhanced');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
 const deps = require("./package.json").dependencies;
-const path = require('path')
 
 module.exports = {
   entry: './src/index',
@@ -14,30 +14,32 @@ module.exports = {
     headers: {
       'Access-Control-Allow-Origin': '*',
     },
-    port: 3002,
     allowedHosts: "all",
+    port: 3003,
     open: true,
     historyApiFallback: true,
   },
 
   resolve: {
-    extensions: ['.jsx', '.js', '.json']
+    extensions: ['.jsx', '.js', '.json'],
   },
 
   module: {
     rules: [
       {
         test: '/\.html/',
-        use: ['html-loader'],
-      },
-      {
-          test: /\.svg$/i,
-          issuer: /\.[jt]sx?$/,
-          use: ['@svgr/webpack', 'url-loader'],
+        use: ['html-loader']
       },
       {
         test: /\.(jpg|png|gif|jpeg|ico)$/,
         loader: 'asset',
+      },
+      {
+        test: /\.(svg)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "file-loader",
+        },
       },
       {
         test: /\.(css|s[ac]ss)$/i,
@@ -52,30 +54,28 @@ module.exports = {
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: 'profile',
+      name: 'card',
       filename: 'remoteEntry.js',
       remotes: {
         'main_app': 'main_app@http://localhost:3000/remoteEntry.js',
       },
       exposes: {
-        './EditAvatarPopup': './src/components/EditAvatarPopup.js',
-        './EditProfilePopup': './src/components/EditProfilePopup.js',
+        './Card': './src/components/Card.js',
       },
       shared: {
         react: {
           singleton: true,
-          eager: true,
           requiredVersion: deps.react,
         },
         'react-dom': {
           singleton: true,
-          eager: true,
           requiredVersion: deps['react-dom'],
         },
         'react-router-dom': {
             singleton: true,
-            requiredVersion: '^5.2.0'
+            requiredVersion: deps['react-router-dom'],
         },
+
         '@material-ui/core': {
           singleton: true,
           requiredVersion: deps['@material-ui/core'],

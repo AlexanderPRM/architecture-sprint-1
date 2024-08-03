@@ -4,27 +4,33 @@ const deps = require("./package.json").dependencies;
 const path = require('path')
 
 module.exports = {
-  mode: 'development',
-  entry: './src/index.js',
+  entry: './src/index',
   output: {
-    publicPath: 'auto',
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'bundle.js',
   },
 
 
   devServer: {
     headers: {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization',
     },
     port: 3000,
-    static: path.join(__dirname, 'dist'),
+    allowedHosts: 'all',
     open: true,
     historyApiFallback: true,
   },
 
+  resolve: {
+    extensions: ['.js', '.jsx', '.json']
+  },
+
   module: {
     rules: [
+      {
+        test: '/\.html/',
+        use: ['html-loader']
+      },
       {
           test: /\.svg$/i,
           issuer: /\.[jt]sx?$/,
@@ -51,22 +57,31 @@ module.exports = {
   plugins: [
     new ModuleFederationPlugin({
       name: 'main_app',
+      filename: 'remoteEntry.js',
       remotes: {
         'auth': 'auth@http://localhost:3001/remoteEntry.js',
         'profile': 'profile@http://localhost:3002/remoteEntry.js',
+        'card': 'card@http://localhost:3003/remoteEntry.js',
       },
       exposes: {
-        'CurrentUserContext': './src/contexts/CurrentUserContext.js'
+        './CurrentUserContext': './src/contexts/CurrentUserContext.js',
+        './PopupWithForm': './src/components/PopupWithForm.js'
       },
       shared: [
         {
           react: {
             singleton: true,
+            eager: true,
             requiredVersion: deps.react,
           },
           'react-dom': {
             singleton: true,
+            eager: true,
             requiredVersion: deps['react-dom'],
+          },
+          'react-router-dom': {
+              singleton: true,
+              requiredVersion: '^5.2.0'
           },
           '@material-ui/core': {
             singleton: true,
@@ -78,7 +93,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'public', 'index.html'),
       filename: './index.html',
-      manifest: "./manifest.json"
+      favicon: './public/favicon.ico'
     }),
   ],
 };

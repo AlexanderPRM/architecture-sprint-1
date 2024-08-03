@@ -15,7 +15,7 @@ const App = () => {
 
     return (
         <BrowserRouter>
-            <Redirect to="./signup" />
+            <Redirect to="/signup" />
             <Route path="/signup">
                 <Register onRegister={handleRegister} />
             </Route>
