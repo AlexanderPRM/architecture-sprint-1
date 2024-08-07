@@ -1,7 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
-function Register ({ onRegister }){
+import '../blocks/login/login.css';
+import '../blocks/auth-form/auth-form.css'
+
+function Login ({ onLogin }){
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -11,15 +13,15 @@ function Register ({ onRegister }){
       email,
       password
     }
-    onRegister(userData);
+    onLogin(userData);
   }
   return (
     <div className="auth-form">
       <form className="auth-form__form" onSubmit={handleSubmit}>
         <div className="auth-form__wrapper">
-          <h3 className="auth-form__title">Регистрация</h3>
+          <h3 className="auth-form__title">Вход</h3>
           <label className="auth-form__input">
-            <input type="text" name="email" id="email"
+            <input type="text" name="name" id="email"
               className="auth-form__textfield" placeholder="Email"
               onChange={e => setEmail(e.target.value)} required  />
           </label>
@@ -29,13 +31,10 @@ function Register ({ onRegister }){
               onChange={e => setPassword(e.target.value)} required  />
           </label>
         </div>
-        <div className="auth-form__wrapper">
-          <button className="auth-form__button" type="submit">Зарегистрироваться</button>
-          <p className="auth-form__text">Уже зарегистрированы? <Link className="auth-form__link" to="/signin">Войти</Link></p>
-        </div>
+        <button className="auth-form__button" type="submit">Войти</button>
       </form>
     </div>
   )
 }
 
-export default Register;
+export default Login;
